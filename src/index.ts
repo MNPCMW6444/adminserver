@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import statusRouter from "./app/routers/status/statusRouter";
+import instancesRouter from "./app/routers/instances";
 
 dotenv.config();
 
@@ -29,4 +29,4 @@ app.listen(port, () => {
   //console.log(ec2);
 });
 
-app.use("/status", statusRouter);
+app.use("/instances", instancesRouter);
