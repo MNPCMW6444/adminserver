@@ -13,6 +13,8 @@ export const client =
     ? "http://localhost:5990"
     : "https://admin.failean.com";
 
+app.use(express.json());
+
 app.use(
   cors({
     origin: [client],

@@ -90,28 +90,30 @@ router.post("/startInstance", async (req, res) => {
 });
 
 router.post("/stopInstance", async (req, res) => {
-  const instanceId = req.body.instanceId;
-
-  const REGION = "us-east-1"; // replace with your region
-  const ec2Client = new EC2({
-    region: REGION,
-    credentials: {
-      accessKeyId: "AKIA6MGDYZ6MAU2NZXTS",
-      secretAccessKey: "rtoMVRJ9aPch0/ArG6/XJTfsWdET3NLNxTTAp8kr",
-    },
-  });
-
-  const params = {
-    InstanceIds: [instanceId],
-  };
-
   try {
+    console.log("instanceId:");
+    console.log(req.body);
+    const instanceId = req.body.instanceId;
+    console.log(instanceId);
+    const REGION = "us-east-1"; // replace with your region
+    const ec2Client = new EC2({
+      region: REGION,
+      credentials: {
+        accessKeyId: "AKIA6MGDYZ6MAU2NZXTS",
+        secretAccessKey: "rtoMVRJ9aPch0/ArG6/XJTfsWdET3NLNxTTAp8kr",
+      },
+    });
+
+    const params = {
+      InstanceIds: [instanceId],
+    };
+
     const data = await ec2Client.stopInstances(params);
     console.log("Success", data.StoppingInstances);
-    res.send("Instance is stopping");
+    res.status(200).send("Instance is stopping");
   } catch (err) {
-    console.log("Error", err);
-    res.send("Error stopping instance");
+    // console.log("Error", err);
+    res.status(500).json({ msg: err });
   }
 });
 
