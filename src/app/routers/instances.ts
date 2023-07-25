@@ -11,13 +11,14 @@ const ec2Client = new EC2({
   },
 });
 
-router.get("/all", async (req, res) => {
+const getInstances = async () => {
   try {
     const data = await ec2Client.send(new DescribeInstancesCommand({}));
     let instanceInfos: {
       id: string;
       type: string;
       state: string;
+      name: string;
     }[] = [];
     data?.Reservations?.forEach((reservation) =>
       reservation?.Instances?.forEach((instance) => {
@@ -25,42 +26,29 @@ router.get("/all", async (req, res) => {
           id: instance.InstanceId + "",
           type: instance.InstanceType + "",
           state: instance?.State?.Name + "",
+          name: instance?.Tags?.find((tag) => tag.Key === "Name")?.Value + "",
         });
       })
     );
-    return res.status(200).json({
-      allInstances: instanceInfos,
-    });
+    return instanceInfos;
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return undefined;
   }
+};
+
+router.get("/all", async (_, res) => {
+  return (await getInstances())
+    ? res.status(200).json({ instances: await getInstances() })
+    : res.status(500).json({ error: "Error getting instances" });
 });
 
-router.get("/running", async (req, res) => {
-  try {
-    const data = await ec2Client.send(new DescribeInstancesCommand({}));
-    let instanceInfos: {
-      id: string;
-      type: string;
-      state: string;
-    }[] = [];
-    data?.Reservations?.forEach((reservation) =>
-      reservation?.Instances?.forEach((instance) => {
-        instanceInfos.push({
-          id: instance.InstanceId + "",
-          type: instance.InstanceType + "",
-          state: instance?.State?.Name + "",
-        });
+router.get("/running", async (_, res) => {
+  const instances = await getInstances();
+  return instances
+    ? res.status(200).json({
+        instances: instances.filter(({ state }) => state === "running"),
       })
-    );
-    return res.status(200).json({
-      runningInstances: instanceInfos.filter(
-        ({ state }) => state === "running"
-      ),
-    });
-  } catch (err) {
-    return res.status(500).json({ error: err });
-  }
+    : res.status(500).json({ error: "Error getting instances" });
 });
 
 router.post("/startInstance", async (req, res) => {
