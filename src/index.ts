@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import statusRouter from "./app/routers/status/statusRouter";
 
 dotenv.config();
 
@@ -25,4 +26,7 @@ app.get("/areyoualive", (_, res) => {
 
 app.listen(port, () => {
   console.log(`Server ready at http://localhost:${port}`);
+  //console.log(ec2);
 });
+
+app.use("/status", statusRouter);
