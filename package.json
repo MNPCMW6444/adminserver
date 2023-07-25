@@ -17,7 +17,7 @@
     "start": "npm run dev",
     "preprod": "npm run update",
     "prod": "npm run build",
-    "d:b": "aws codeartifact login --tool npm --repository failean --domain failean --domain-owner 988253048728 --region us-east-1 && echo '@failean:registry=https://failean-988253048728.d.codeartifact.us-east-1.amazonaws.com/npm/failean/' >> ~/.npmrc && cp ~/.npmrc . && VERSION=$(node -p \"require('./package.json').version\") && docker build --platform amd64 -t 988253048728.dkr.ecr.us-east-1.amazonaws.com/adminserver:$VERSION .",
+    "d:b": "VERSION=$(node -p \"require('./package.json').version\") && docker build --platform amd64 -t 988253048728.dkr.ecr.us-east-1.amazonaws.com/adminserver:$VERSION .",
     "dev": "nodemon",
     "preudev": "npm run update",
     "udev": "npm run dev",
