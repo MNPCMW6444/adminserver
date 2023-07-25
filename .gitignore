@@ -1,0 +1,12 @@
+.DS_Store
+.vscode
+
+.env
+.npmrc
+
+node_modules
+package-lock.json
+
+dist
+build
+
