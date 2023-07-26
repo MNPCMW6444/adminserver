@@ -4,7 +4,6 @@ phases:
   install:
     commands:
       - apt-get update
-      - apt-get install -y jq
 
   pre_build:
     commands:
@@ -14,11 +13,10 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - IMAGE_TAG=$(jq -r ".version" package.json)
       - npm run d:b
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image to Amazon ECR...
-      - docker push 988253048728.dkr.ecr.us-east-1.amazonaws.com/adminserver:$IMAGE_TAG
+      - docker push 988253048728.dkr.ecr.us-east-1.amazonaws.com/adminserver:$VERSION
