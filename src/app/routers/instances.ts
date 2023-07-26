@@ -54,15 +54,6 @@ router.get("/running", async (_, res) => {
 router.post("/startInstance", async (req, res) => {
   const instanceId = req.body.instanceId;
 
-  const REGION = "us-east-1"; // replace with your region
-  const ec2Client = new EC2({
-    region: REGION,
-    credentials: {
-      accessKeyId: "AKIA6MGDYZ6MAU2NZXTS",
-      secretAccessKey: "rtoMVRJ9aPch0/ArG6/XJTfsWdET3NLNxTTAp8kr",
-    },
-  });
-
   const params = {
     InstanceIds: [instanceId],
   };
@@ -83,14 +74,6 @@ router.post("/stopInstance", async (req, res) => {
     console.log(req.body);
     const instanceId = req.body.instanceId;
     console.log(instanceId);
-    const REGION = "us-east-1"; // replace with your region
-    const ec2Client = new EC2({
-      region: REGION,
-      credentials: {
-        accessKeyId: "AKIA6MGDYZ6MAU2NZXTS",
-        secretAccessKey: "rtoMVRJ9aPch0/ArG6/XJTfsWdET3NLNxTTAp8kr",
-      },
-    });
 
     const params = {
       InstanceIds: [instanceId],
@@ -100,8 +83,101 @@ router.post("/stopInstance", async (req, res) => {
     console.log("Success", data.StoppingInstances);
     res.status(200).send("Instance is stopping");
   } catch (err) {
-    // console.log("Error", err);
     res.status(500).json({ msg: err });
+  }
+});
+
+router.post("/launch", async (req, res) => {
+  const { subdomain, password } = req.body;
+
+  try {
+    const securityGroupParams = {
+      Description: "Security group for SSH and HTTPS",
+      GroupName: `SSHAndHTTPS_${Date.now()}`,
+      VpcId: "vpc-0c58fc34f99584ab7",
+    };
+
+    const createSGResponse = await ec2Client.createSecurityGroup(
+      securityGroupParams
+    );
+    const groupId = createSGResponse.GroupId;
+
+    if (!groupId) {
+      throw new Error("Failed to create security group");
+    }
+
+    console.log("Security Group Created", groupId);
+
+    const ingressParams = {
+      GroupId: groupId,
+      IpPermissions: [
+        {
+          IpProtocol: "tcp",
+          FromPort: 22,
+          ToPort: 22,
+          IpRanges: [{ CidrIp: "0.0.0.0/0" }],
+        },
+        {
+          IpProtocol: "tcp",
+          FromPort: 443,
+          ToPort: 443,
+          IpRanges: [{ CidrIp: "0.0.0.0/0" }],
+        },
+      ],
+    };
+
+    await ec2Client.authorizeSecurityGroupIngress(ingressParams);
+    console.log("Ingress Successfully Set");
+
+    const instanceParams = {
+      ImageId: "ami-025e2a3b086b52feb",
+      InstanceType: "t2.micro",
+      SecurityGroupIds: [groupId],
+      MinCount: 1,
+      MaxCount: 1,
+      IamInstanceProfile: {
+        Name: "devserverlauncher",
+      },
+      UserData: Buffer.from(
+        `#!/bin/bash
+/home/ubuntu/setup_script.sh ${password} ${subdomain}`
+      ).toString("base64"),
+    };
+
+    const instanceData = await ec2Client.runInstances(instanceParams);
+    console.log("Success", instanceData);
+
+    const instances = instanceData.Instances;
+    if (!instances || instances.length === 0) {
+      throw new Error("No instances were created");
+    }
+
+    const instanceId = instances[0].InstanceId;
+    if (!instanceId) {
+      throw new Error("Instance ID is undefined");
+    }
+
+    const tagParams = {
+      Resources: [instanceId],
+      Tags: [
+        {
+          Key: "AUTO_DNS_ZONE",
+          Value: "Z0366949UUQPUHCZ2AZT",
+        },
+        {
+          Key: "AUTO_DNS_NAME",
+          Value: `${subdomain}.failean.com`,
+        },
+      ],
+    };
+
+    await ec2Client.createTags(tagParams);
+    console.log("Tags have been created and applied successfully");
+
+    res.status(200).json({ success: true, data: instanceData });
+  } catch (err) {
+    console.log("Error", err);
+    res.status(500).json({ error: err });
   }
 });
 
