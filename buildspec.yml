@@ -19,4 +19,5 @@ phases:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image to Amazon ECR...
+      - echo $VERSION
       - docker push 988253048728.dkr.ecr.us-east-1.amazonaws.com/adminserver:$VERSION
