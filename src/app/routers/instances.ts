@@ -130,11 +130,12 @@ router.post("/launch", async (req, res) => {
     console.log("Ingress Successfully Set");
 
     const instanceParams = {
-      ImageId: "ami-025e2a3b086b52feb",
+      ImageId: "ami-0331c28467b27651d",
       InstanceType: "t2.micro",
       SecurityGroupIds: [groupId],
       MinCount: 1,
       MaxCount: 1,
+      KeyName: "admin",
       IamInstanceProfile: {
         Name: "devserverlauncher",
       },
@@ -142,6 +143,17 @@ router.post("/launch", async (req, res) => {
         `#!/bin/bash
 /home/ubuntu/setup_script.sh ${password} ${subdomain}`
       ).toString("base64"),
+      TagSpecifications: [
+        {
+          ResourceType: "instance",
+          Tags: [
+            {
+              Key: "Name",
+              Value: "dev-" + subdomain,
+            },
+          ],
+        },
+      ],
     };
 
     const instanceData = await ec2Client.runInstances(instanceParams);
