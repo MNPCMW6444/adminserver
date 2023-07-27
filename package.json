@@ -5,6 +5,7 @@
     "version:patch": "npm version patch --no-git-tag-version",
     "version:minor": "npm version minor --no-git-tag-version",
     "version:major": "npm version major --no-git-tag-version",
+    "preclean": "npm run connect",
     "clean": "rm -rf node_modules package-lock.json dist",
     "clean:p": "rm -rf node_modules package-lock.json",
     "preupdatesimple": "npx npm-check-updates -u",
