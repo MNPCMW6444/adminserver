@@ -141,8 +141,9 @@ router.post("/launch", async (req, res) => {
       },
       UserData: Buffer.from(
         `#!/bin/bash
-/home/ubuntu/setup_script.sh ${password} ${subdomain}`
+  /home/ubuntu/setup_script.sh ${password} ${subdomain} > /home/ubuntu/setup.log 2>&1`
       ).toString("base64"),
+
       TagSpecifications: [
         {
           ResourceType: "instance",
