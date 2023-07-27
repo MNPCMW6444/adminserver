@@ -14,7 +14,7 @@
     "prebuild": "npm run version:patch",
     "build": "npx ts-node build.ts",
     "lint": "eslint . --ext .ts",
-    "start": "npm run dev",
+    "start": "npm run udev",
     "preprod": "npm run update",
     "prod": "npm run build",
     "d:b": "VERSION=$(node -p \"require('./package.json').version\") && docker build --platform amd64 -t 988253048728.dkr.ecr.us-east-1.amazonaws.com/adminserver:$VERSION .",
