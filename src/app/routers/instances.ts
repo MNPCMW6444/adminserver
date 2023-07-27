@@ -130,7 +130,7 @@ router.post("/launch", async (req, res) => {
     console.log("Ingress Successfully Set");
 
     const instanceParams = {
-      ImageId: "ami-0331c28467b27651d",
+      ImageId: "ami-03b8ae6d8083a3d67",
       InstanceType: "t2.micro",
       SecurityGroupIds: [groupId],
       MinCount: 1,
