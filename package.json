@@ -17,7 +17,7 @@
     "lint": "eslint . --ext .ts",
     "start": "npm run udev",
     "preconnect": "aws codeartifact login --tool npm --repository failean --domain failean --domain-owner 988253048728 --region us-east-1",
-    "connect": "npm run setgit1",
+    "connect": "npm run setgit",
     "presetgit": "npm config set registry https://registry.npmjs.org/",
     "setgit": "npm config set @failean:registry https://failean-988253048728.d.codeartifact.us-east-1.amazonaws.com/npm/failean/",
     "preprod": "npm run update",
