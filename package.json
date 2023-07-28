@@ -1,32 +1,26 @@
 {
   "name": "failean-adminserver",
   "version": "5.0.1",
+  "private": true,
   "scripts": {
-    "version:patch": "npm version patch --no-git-tag-version",
-    "version:minor": "npm version minor --no-git-tag-version",
-    "version:major": "npm version major --no-git-tag-version",
-    "preclean": "npm run connect",
-    "clean": "rm -rf node_modules package-lock.json dist",
-    "clean:p": "rm -rf node_modules package-lock.json",
-    "preupdatesimple": "npx npm-check-updates -u",
-    "updatesimple": "npm i",
-    "preupdate": "npm run clean",
-    "update": "npm run updatesimple",
-    "prebuild": "npm run version:patch",
+    "v..": "npm version patch --no-git-tag-version",
+    "v.": "npm version minor --no-git-tag-version",
+    "v": "npm version major --no-git-tag-version",
+    "clean:all": "rm -rf node_modules build package-lock.json",
+    "clean:prod": "rm -rf node_modules package-lock.json",
+    "update": "npm run npmconf && npx npm-check-updates -u && npm i",
+    "update:prod": "npx npm-check-updates -u && npm i",
     "build": "npx ts-node build.ts",
-    "lint": "eslint . --ext .ts",
     "start": "npm run udev",
-    "preconnect": "aws codeartifact login --tool npm --repository failean --domain failean --domain-owner 988253048728 --region us-east-1",
-    "connect": "npm run setgit",
-    "presetgit": "npm config set registry https://registry.npmjs.org/",
-    "setgit": "npm config set @failean:registry https://failean-988253048728.d.codeartifact.us-east-1.amazonaws.com/npm/failean/",
-    "preprod": "npm run update",
-    "prod": "npm run build",
-    "d:b": "VERSION=$(node -p \"require('./package.json').version\") && docker build --platform amd64 -t 988253048728.dkr.ecr.us-east-1.amazonaws.com/adminserver:$VERSION .",
-    "dev": "nodemon",
-    "preudev": "npm run update",
-    "udev": "npm run dev",
-    "pred:b": "rm -f .npmrc"
+    "npmconf": "rm -f .npmrc && aws codeartifact login --tool npm --repository failean --domain failean --domain-owner 988253048728 --region us-east-1 && npm config set registry https://registry.npmjs.org/ && npm config set @failean:registry https://failean-988253048728.d.codeartifact.us-east-1.amazonaws.com/npm/failean/",
+    "prod": "npm run update:prod && npm run build",
+    "docker": "VERSION=$(node -p \"require('./package.json').version\") && CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain failean --domain-owner 988253048728 --query authorizationToken --output text) && docker build --build-arg CODEARTIFACT_TOKEN=$CODEARTIFACT_TOKEN -t 988253048728.dkr.ecr.us-east-1.amazonaws.com/adminserver:$VERSION .",
+    "dev:fullclean": "npm run clean:all && npm run dev:fullfast",
+    "dev:fullfast": "npm run update && npm run dev:fast",
+    "dev:fast": "nodemon",
+    "dev": "npm run dev:fast",
+    "udev": "npm run dev:fullfast",
+    "lint": "eslint . --ext .ts"
   },
   "nodemonConfig": {
     "watch": [
@@ -43,6 +37,13 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "dependencies": {
+    "@aws-sdk/client-ec2": "^3.378.0",
+    "@aws-sdk/client-s3": "^3.378.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
   "devDependencies": {
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
@@ -51,12 +52,5 @@
     "fs-extra": "^11.1.1",
     "jet-logger": "^1.3.1",
     "ts-node": "^10.9.1"
-  },
-  "dependencies": {
-    "@aws-sdk/client-ec2": "^3.378.0",
-    "@aws-sdk/client-s3": "^3.378.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2"
   }
 }

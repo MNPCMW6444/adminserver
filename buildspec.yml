@@ -15,7 +15,7 @@ phases:
     commands:
       - echo Build started on `date`
       - IMAGE_TAG=$(jq -r ".version" package.json)
-      - npm run d:b
+      - npm run docker
 
   post_build:
     commands:
