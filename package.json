@@ -1,6 +1,6 @@
 {
   "name": "failean-adminserver",
-  "version": "5.0.1",
+  "version": "5.9.0",
   "private": true,
   "scripts": {
     "v..": "npm version patch --no-git-tag-version",
