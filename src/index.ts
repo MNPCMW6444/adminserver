@@ -26,9 +26,8 @@ app.get("/areyoualive", (_, res) => {
   res.json({ answer: "yes", version: process.env.npm_package_version });
 });
 
-app.listen(port, () => {
-  console.log(`Server ready at http://localhost:${port}`);
-  //console.log(ec2);
+app.listen(port as any, "0.0.0.0", () => {
+  console.log(`Server ready at http://0.0.0.0:${port}`);
 });
 
 app.use("/instances", instancesRouter);
