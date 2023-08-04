@@ -43,7 +43,7 @@ router.get("/all", async (_, res) => {
 });
 
 router.get("/running", async (_, res) => {
-  const instances = getInstances();
+  const instances = await getInstances();
   return instances
     ? res.status(200).json({
         instances: instances.filter(({ state }) => state === "running"),
